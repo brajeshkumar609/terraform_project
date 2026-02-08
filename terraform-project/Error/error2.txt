@@ -1,0 +1,15 @@
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> terraform init     
+
+Initializing the backend...
+Initializing modules...
+╷
+│ Error: Duplicate required providers configuration
+│
+│   on versions.tf line 4, in terraform:
+│    4:   required_providers {
+│
+│ A module may have only one required providers configuration. The required providers were previously        
+│ configured at provider.tf:4,3-21.
+╵
+
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project>
