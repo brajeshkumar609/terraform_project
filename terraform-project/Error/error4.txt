@@ -1,0 +1,223 @@
+
+╷
+│ Error: Duplicate resource "aws_internet_gateway" configuration
+│
+│   on modules\vpc\outputs.tf line 10:
+│   10: resource "aws_internet_gateway" "this" {
+│
+│ A aws_internet_gateway resource named "this" was already declared at modules\vpc\main.tf:10,1-39. Resource 
+│ names must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 16:
+│   16: resource "aws_subnet" "public" {
+│
+│ A aws_subnet resource named "public" was already declared at modules\vpc\main.tf:16,1-31. Resource names   
+│ must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 30:
+│   30: resource "aws_subnet" "private" {
+│
+│ A aws_subnet resource named "private" was already declared at modules\vpc\main.tf:30,1-32. Resource names  
+│ must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_route_table" configuration
+│
+│   on modules\vpc\outputs.tf line 43:
+│   43: resource "aws_route_table" "public" {
+│
+│ A aws_route_table resource named "public" was already declared at modules\vpc\main.tf:43,1-36. Resource    
+│ names must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_route_table_association" configuration
+│
+│   on modules\vpc\outputs.tf line 54:
+│   54: resource "aws_route_table_association" "public" {
+│
+│ A aws_route_table_association resource named "public" was already declared at modules\vpc\main.tf:54,1-48. 
+│ Resource names must be unique per type in each module.
+╵
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> terraform init     
+
+Initializing the backend...
+Initializing modules...
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 1:
+│    1: output "instance_id" {
+│
+│ An output named "instance_id" was already defined at modules\ec2\main.tf:20,1-21. Output names must be     
+│ unique within a module.
+╵
+
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 5:
+│    5: output "public_ip" {
+│
+│ An output named "public_ip" was already defined at modules\ec2\main.tf:24,1-19. Output names must be       
+│ unique within a module.
+╵
+
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 9:
+│    9: output "private_ip" {
+│
+│ An output named "private_ip" was already defined at modules\ec2\main.tf:28,1-20. Output names must be      
+│ unique within a module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_vpc" configuration
+│
+│   on modules\vpc\outputs.tf line 1:
+│    1: resource "aws_vpc" "this" {
+│
+│ A aws_vpc resource named "this" was already declared at modules\vpc\main.tf:1,1-26. Resource names must be 
+│ unique per type in each module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_internet_gateway" configuration
+│
+│   on modules\vpc\outputs.tf line 10:
+│   10: resource "aws_internet_gateway" "this" {
+│
+│ A aws_internet_gateway resource named "this" was already declared at modules\vpc\main.tf:10,1-39. Resource 
+│ names must be unique per type in each module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 16:
+│   16: resource "aws_subnet" "public" {
+│
+│ A aws_subnet resource named "public" was already declared at modules\vpc\main.tf:16,1-31. Resource names   
+│ must be unique per type in each module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 30:
+│   30: resource "aws_subnet" "private" {
+│
+│ A aws_subnet resource named "private" was already declared at modules\vpc\main.tf:30,1-32. Resource names  
+│ must be unique per type in each module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_route_table" configuration
+│
+│   on modules\vpc\outputs.tf line 43:
+│   43: resource "aws_route_table" "public" {
+│
+│ A aws_route_table resource named "public" was already declared at modules\vpc\main.tf:43,1-36. Resource    
+│ names must be unique per type in each module.
+╵
+
+╷
+│ Error: Duplicate resource "aws_route_table_association" configuration
+│
+│   on modules\vpc\outputs.tf line 54:
+│   54: resource "aws_route_table_association" "public" {
+│
+│ A aws_route_table_association resource named "public" was already declared at modules\vpc\main.tf:54,1-48. 
+│ Resource names must be unique per type in each module.
+╵
+
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> terraform plan
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 1:
+│    1: output "instance_id" {
+│
+│ An output named "instance_id" was already defined at modules\ec2\main.tf:20,1-21. Output names must be     
+│ unique within a module.
+╵
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 5:
+│    5: output "public_ip" {
+│
+│ An output named "public_ip" was already defined at modules\ec2\main.tf:24,1-19. Output names must be       
+│ unique within a module.
+╵
+╷
+│ Error: Duplicate output definition
+│
+│   on modules\ec2\outputs.tf line 9:
+│    9: output "private_ip" {
+│
+│ An output named "private_ip" was already defined at modules\ec2\main.tf:28,1-20. Output names must be      
+│ unique within a module.
+╵
+╷
+│ Error: Duplicate resource "aws_vpc" configuration
+│
+│   on modules\vpc\outputs.tf line 1:
+│    1: resource "aws_vpc" "this" {
+│
+│ A aws_vpc resource named "this" was already declared at modules\vpc\main.tf:1,1-26. Resource names must be 
+│ unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_internet_gateway" configuration
+│
+│   on modules\vpc\outputs.tf line 10:
+│   10: resource "aws_internet_gateway" "this" {
+│
+│ A aws_internet_gateway resource named "this" was already declared at modules\vpc\main.tf:10,1-39. Resource 
+│ names must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 16:
+│   16: resource "aws_subnet" "public" {
+│
+│ A aws_subnet resource named "public" was already declared at modules\vpc\main.tf:16,1-31. Resource names   
+│ must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_subnet" configuration
+│
+│   on modules\vpc\outputs.tf line 30:
+│   30: resource "aws_subnet" "private" {
+│
+│ A aws_subnet resource named "private" was already declared at modules\vpc\main.tf:30,1-32. Resource names  
+│ must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_route_table" configuration
+│
+│   on modules\vpc\outputs.tf line 43:
+│   43: resource "aws_route_table" "public" {
+│
+│ A aws_route_table resource named "public" was already declared at modules\vpc\main.tf:43,1-36. Resource    
+│ names must be unique per type in each module.
+╵
+╷
+│ Error: Duplicate resource "aws_route_table_association" configuration
+│
+│   on modules\vpc\outputs.tf line 54:
+│   54: resource "aws_route_table_association" "public" {
+│
+│ A aws_route_table_association resource named "public" was already declared at modules\vpc\main.tf:54,1-48. 
+│ Resource names must be unique per type in each module.
+╵
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> 
