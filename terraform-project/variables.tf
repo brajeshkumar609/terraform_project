@@ -1,85 +1,61 @@
-#############################################
-# Environment Name
-#############################################
-
+##############################################
+# Environment & Tags
+##############################################
 variable "environment" {
-  description = "Environment name (dev/staging/prod)"
+  description = "Environment name (dev/qa/stage/prod)"
   type        = string
-
   validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be dev, staging, or prod."
+    condition     = contains(["dev","qa","stage","prod"], var.environment)
+    error_message = "environment must be one of: dev, qa, stage, prod."
   }
 }
-
-#############################################
-# Instance Type
-#############################################
-
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-
-  validation {
-    condition     = can(regex("^t[2-3]\\..*", var.instance_type))
-    error_message = "Only t2 or t3 instance types are allowed for safety."
-  }
-}
-
-#############################################
-# Optional Custom AMI
-#############################################
-
-variable "ami_id" {
-  description = "Custom AMI ID (leave blank to use latest Amazon Linux)"
-  type        = string
-  default     = ""
-}
-
-#############################################
-# Network Configuration
-#############################################
-
-variable "subnet_id" {
-  description = "Subnet ID where EC2 will be launched"
-  type        = string
-}
-
-variable "security_group_ids" {
-  description = "List of security group IDs"
-  type        = list(string)
-}
-
-variable "associate_public_ip" {
-  description = "Assign public IP?"
-  type        = bool
-  default     = false
-}
-
-#############################################
-# Key Pair
-#############################################
-
-variable "key_name" {
-  description = "Existing AWS key pair name"
-  type        = string
-}
-
-#############################################
-# Tags
-#############################################
 
 variable "common_tags" {
-  description = "Common tags to apply"
+  description = "Common tags applied to all resources"
   type        = map(string)
 }
 
-#############################################
-# Safety
-#############################################
+##############################################
+# VPC inputs
+##############################################
+variable "vpc_cidr" {
+  type        = string
+  description = "VPC CIDR block"
+}
 
-variable "prevent_destroy" {
-  description = "Prevent accidental destroy"
-  type        = bool
-  default     = true
+variable "public_subnet_cidrs" {
+  type        = list(string)
+  description = "List of CIDRs for public subnets"
+}
+
+variable "private_subnet_cidrs" {
+  type        = list(string)
+  description = "List of CIDRs for private subnets"
+}
+
+variable "azs" {
+  type        = list(string)
+  description = "Availability zones for subnets (must match subnet list lengths)"
+}
+
+##############################################
+# EC2 inputs
+##############################################
+variable "ami_id" {
+  type        = string
+  description = "AMI ID for EC2 instance"
+}
+
+variable "instance_type" {
+  type        = string
+  description = "EC2 instance type"
+  validation {
+    condition     = can(regex("^t2|t3|t4g|c5|m5|r5", var.instance_type))
+    error_message = "Use a valid instance family (t2, t3, t4g, c5, m5, r5, etc.)."
+  }
+}
+
+variable "key_name" {
+  type        = string
+  description = "Name of an existing EC2 key pair in the selected region"
 }
