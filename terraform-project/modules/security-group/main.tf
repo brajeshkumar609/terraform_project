@@ -1,8 +1,9 @@
 resource "aws_security_group" "this" {
   name        = "${var.environment}-sg"
-  description = "Allow SSH"
+  description = "Security group for EC2"
   vpc_id      = var.vpc_id
 
+  # Allow SSH from anywhere (for learning). Tighten this in real projects.
   ingress {
     description = "SSH"
     from_port   = 22
@@ -18,8 +19,5 @@ resource "aws_security_group" "this" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(
-    var.common_tags,
-    { Name = "${var.environment}-sg" }
-  )
+  tags = merge(var.common_tags, { Name = "${var.environment}-sg" })
 }
