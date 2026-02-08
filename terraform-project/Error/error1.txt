@@ -1,0 +1,32 @@
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> terraform init     
+ 
+Initializing the backend...
+
+Successfully configured the backend "local"! Terraform will automatically
+use this backend unless the backend configuration changes.
+Initializing modules...
+- ec2 in modules\ec2
+- security_group in modules\security-group
+- vpc in modules\vpc
+Terraform encountered problems during initialisation, including problems
+with the configuration, described below.
+
+The Terraform configuration must be valid before initialization so that
+Terraform can determine which modules and providers need to be installed.
+╷
+│ Error: Invalid character
+│
+│   on versions.tf line 4:
+│    4: ``
+│
+│ The "`" character is not valid. To create a multi-line string, use the "heredoc" syntax, like "<<EOT".     
+╵
+
+╷
+│ Error: Argument or block definition required
+│
+│   on versions.tf line 4:
+│    4: ``
+│
+│ An argument or block definition is required here.
+╵
