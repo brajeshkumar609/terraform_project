@@ -1,0 +1,17 @@
+PS C:\Users\braje\OneDrive\Desktop\Terraform_project\terraform_project\terraform-project> terraform plan
+var.key_name
+  Existing AWS key pair name
+
+  Enter a value: terraform
+
+var.security_group_ids
+  List of security group IDs
+
+  Enter a value: var.subnet_id
+  Subnet ID where EC2 will be launched
+
+  Enter a value:
+
+Interrupt received.
+Please wait for Terraform to exit or data loss may occur.
+Gracefully shutting down...
