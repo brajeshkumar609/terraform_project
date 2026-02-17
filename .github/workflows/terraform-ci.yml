@@ -99,6 +99,8 @@ jobs:
         run: terraform plan -out="${{ github.workspace }}/plan.tfplan" -no-color
 
       - name: Export plan to JSON & text
+        working-directory: ./terraform-project
+
         shell: bash
         run: |
           terraform show -json "${{ github.workspace }}/plan.tfplan" > reports/plan.json
