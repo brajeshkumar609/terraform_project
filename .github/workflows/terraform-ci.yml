@@ -41,6 +41,14 @@ jobs:
 
       - name: Create reports directory
         run: mkdir -p reports
+        
+      - name: Show repo tree
+        run: |
+          pwd
+          ls -la
+          echo "---- terraform-project ----"
+          ls -la ./terraform-project
+
 
       # ---------- Style & Syntax ----------
       - name: Terraform fmt (check+diff → reports/terraform_fmt.diff)
