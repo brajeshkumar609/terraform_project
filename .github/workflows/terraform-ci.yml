@@ -98,13 +98,14 @@ jobs:
         shell: bash
         run: terraform plan -out="${{ github.workspace }}/plan.tfplan" -no-color
 
+     
       - name: Export plan to JSON & text
         working-directory: ./terraform-project
-
         shell: bash
         run: |
-          terraform show -json "${{ github.workspace }}/plan.tfplan" > reports/plan.json
-          terraform show -no-color "${{ github.workspace }}/plan.tfplan" > reports/plan.txt
+          terraform show -json plan.tfplan > ../reports/plan.json
+          terraform show -no-color plan.tfplan > ../reports/plan.txt
+
 
       # --- Infracost: simple cost breakdown (no PR comment, no diff) ---
       - name: Setup Infracost
