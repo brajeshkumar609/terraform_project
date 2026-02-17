@@ -8,8 +8,8 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
 
   # Performance & observability
-  ebs_optimized = true                # CKV_AWS_135
-  monitoring    = true                # CKV_AWS_136 (detailed CloudWatch monitoring)
+  ebs_optimized = true # CKV_AWS_135
+  monitoring    = true # CKV_AWS_136 (detailed CloudWatch monitoring)
 
   # Encrypt the root volume (CKV_AWS_8)
   root_block_device {
@@ -40,9 +40,9 @@ resource "aws_iam_role" "ec2_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
+      Effect    = "Allow",
       Principal = { Service = "ec2.amazonaws.com" },
-      Action   = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -58,6 +58,6 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
-output "instance_id"  { value = aws_instance.this.id }
-output "public_ip"   { value = aws_instance.this.public_ip }
-output "private_ip"  { value = aws_instance.this.private_ip }
+output "instance_id" { value = aws_instance.this.id }
+output "public_ip" { value = aws_instance.this.public_ip }
+output "private_ip" { value = aws_instance.this.private_ip }
