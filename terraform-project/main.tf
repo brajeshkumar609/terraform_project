@@ -25,10 +25,10 @@ module "security_group" {
 # EC2 (in first private subnet)
 ##############################################
 module "ec2" {
-  source            = "./modules/ec2"
-  ami_id            = var.ami_id
-  instance_type     = var.instance_type
-  key_name          = var.key_name
+  source        = "./modules/ec2"
+  ami_id        = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
 
   subnet_id         = module.vpc.private_subnet_ids[0]
   security_group_id = module.security_group.security_group_id
