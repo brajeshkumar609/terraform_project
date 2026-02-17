@@ -1,5 +1,7 @@
 variable "ami_id" {
   type = string
+  default     = "ami-0c02fb55956c7d316"
+
 }
 
 variable "instance_type" {
@@ -25,3 +27,4 @@ variable "environment" {
 variable "common_tags" {
   type = map(string)
 }
+
