@@ -8,8 +8,8 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = [var.security_group_id]
   key_name               = var.key_name
 
-  ebs_optimized               = true     # CKV_AWS_135
-  monitoring                  = true     # CKV_AWS_1
+  ebs_optimized = true # CKV_AWS_135
+  monitoring    = true # CKV_AWS_1
 
 
   tags = merge(var.common_tags, {
