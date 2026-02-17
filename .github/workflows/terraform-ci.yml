@@ -45,17 +45,18 @@ jobs:
       # ---------- Style & Syntax ----------
       - name: Terraform fmt (check+diff → reports/terraform_fmt.diff)
         run: |
-          terraform fmt -check -diff -recursive | tee reports/terraform_fmt.diff
-          test ${PIPESTATUS[0]} -eq 0 || echo "fmt differences detected (logged to reports/terraform_fmt.diff)"
+          terraform -chdir=${{ env.TF_DIR }} fmt -check -diff -recursive | tee reports/terraform_fmt.diff
+          test ${PIPESTATUS[0]} -eq 0 || echo "fmt differences detected (logged to reports/terraform_fmt.diff)
+
         shell: bash
         # (fmt -check/-diff behavior per HashiCorp docs)  [6](https://developer.hashicorp.com/terraform/cli/commands/fmt)
 
       - name: Terraform init
-        run: terraform init -upgrade
+
+        run: terraform -chdir=${{ env.TF_DIR }} init -upgrade
 
       - name: Terraform validate (→ reports/terraform_validate.txt)
-        run: terraform validate | tee reports/terraform_validate.txt || true
-
+        run: terraform -chdir=${{ env.TF_DIR }} validate | tee reports/terraform_validate.txt || true
       # ---------- Lint & Security (soft fail, write files) ----------
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
@@ -85,8 +86,7 @@ jobs:
 
       # ---------- Terraform plan ----------
       - name: Terraform plan (binary)
-        run: terraform plan -out=plan.tfplan -no-color
-
+        run: terraform -chdir=${{ env.TF_DIR }} plan -out=${{ github.workspace }}/plan.tfplan -no-color
       - name: Export plan to JSON & text
         run: |
           terraform show -json plan.tfplan > plan.json
