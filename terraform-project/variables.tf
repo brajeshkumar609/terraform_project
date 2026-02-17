@@ -44,6 +44,7 @@ variable "azs" {
 variable "ami_id" {
   type        = string
   description = "AMI ID for EC2 instance"
+  default     = "ami-0c02fb55956c7d316"
 }
 
 variable "instance_type" {
@@ -64,4 +65,5 @@ variable "aws_region" {
   type        = string
   description = "AWS region to deploy into"
 }
+
 
