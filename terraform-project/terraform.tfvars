@@ -1,13 +1,24 @@
-# ---- Environment ----
+# --------------------------
+# Environment
+# --------------------------
 environment = "prod"
 
-# ---- Tags ----
+# --------------------------
+# Tags
+# --------------------------
 common_tags = {
   project = "terraform-prod"
   owner   = "brajesh"
 }
 
-# ---- VPC ----
+# --------------------------
+# Region (read by provider)
+# --------------------------
+aws_region = "us-east-1"
+
+# --------------------------
+# VPC & Subnets
+# --------------------------
 vpc_cidr = "10.0.0.0/16"
 
 public_subnet_cidrs = [
@@ -20,13 +31,16 @@ private_subnet_cidrs = [
   "10.0.12.0/24",
 ]
 
-# Adjust AZs to your region & account
-azs = ["ap-south-1a", "ap-south-1b"]
+# Updated AZs for us-east-1
+azs = ["us-east-1a", "us-east-1b"]
 
-# ---- EC2 ----
-# Make sure this AMI exists in your chosen region (ap-south-1 example below)
-ami_id        = "ami-0f5ee92e2d63afc18"
-instance_type = "t2.micro"
+# --------------------------
+# EC2
+# --------------------------
+# AMI will be resolved by data source (see code changes below)
+instance_type = "t3.micro"
 
-# This key pair must already exist in the same region
+# Key pair must EXIST in us-east-1 (EC2 → Key Pairs)
 key_name = "terraform"
+# If your key pair in us-east-1 is named "AWS", then use:
+# key_name = "AWS"
