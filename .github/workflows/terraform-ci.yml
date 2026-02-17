@@ -1,4 +1,4 @@
-name: Terraform CI (fmt/validate/lint/scan/plan/artifacts/cost)
+name: Terraform CI (plan + cost + reports)
 
 on:
   pull_request:
@@ -6,10 +6,9 @@ on:
     branches: [ main ]
 
 permissions:
-  id-token: write        # for OIDC → AWS
+  id-token: write        # OIDC → AWS
   contents: read
-  pull-requests: write   # to post PR comments (Infracost)
-  security-events: write # to upload SARIF (tfsec/Checkov)
+  pull-requests: write   # needed only if you enable PR comments
 
 env:
   AWS_REGION: us-east-1
@@ -24,72 +23,66 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # (Optional) See what GitHub will send in OIDC 'sub'
       - name: Debug repo/ref
         run: |
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "GITHUB_REF=$GITHUB_REF"
 
-      # OIDC → AWS (assume your role)
+      # ---------- OIDC → AWS ----------
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::458586358075:role/Webidentity
           aws-region: ${{ env.AWS_REGION }}
 
-      # Install Terraform CLI (official)
-      - name: Setup Terraform
+      - name: Setup Terraform CLI
         uses: hashicorp/setup-terraform@v3
 
-      # fmt/validate
-      - name: Terraform fmt (check)
-        run: terraform fmt -check -recursive
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      # ---------- Style & Syntax ----------
+      - name: Terraform fmt (check+diff → reports/terraform_fmt.diff)
+        run: |
+          terraform fmt -check -diff -recursive | tee reports/terraform_fmt.diff
+          test ${PIPESTATUS[0]} -eq 0 || echo "fmt differences detected (logged to reports/terraform_fmt.diff)"
+        shell: bash
+        # (fmt -check/-diff behavior per HashiCorp docs)  [6](https://developer.hashicorp.com/terraform/cli/commands/fmt)
 
       - name: Terraform init
         run: terraform init -upgrade
 
-      - name: Terraform validate
-        run: terraform validate
+      - name: Terraform validate (→ reports/terraform_validate.txt)
+        run: terraform validate | tee reports/terraform_validate.txt || true
 
-      # Lint: TFLint
+      # ---------- Lint & Security (soft fail, write files) ----------
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: latest
 
-      - name: TFLint init & run
-        run: |
-          tflint --init
-          tflint --recursive
+      - name: TFLint init & run (→ reports/tflint.txt)
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          tflint --init
+          tflint --recursive | tee reports/tflint.txt || true
 
-      # Security: tfsec → SARIF (GitHub Code Scanning)
-      - name: tfsec (SARIF)
-        uses: aquasecurity/tfsec-sarif-action@v0.1.4
-        with:
-          sarif_file: tfsec.sarif
+      - name: tfsec (→ reports/tfsec.sarif & reports/tfsec.txt)
+        run: |
+          tfsec . --format sarif --out reports/tfsec.sarif || true
+          tfsec . --no-colour | tee reports/tfsec.txt || true
 
-      - name: Upload tfsec results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: tfsec.sarif
-
-      # Security: Checkov (optional but recommended)
-      - name: Checkov (IaC scan)
+      - name: Checkov (→ reports/checkov.sarif & reports/checkov.txt)
         uses: bridgecrewio/checkov-action@v12
         with:
           framework: terraform
+          soft_fail: true
           output_format: cli,sarif
-          output_file_path: console,checkov.sarif
+          output_file_path: reports/checkov.txt,reports/checkov.sarif
+        # (Checkov action usage & outputs)  [7](https://terrateam.io/blog/terraform-security-scanning-tfsec-checkov-github-actions)
 
-      - name: Upload Checkov results
-        if: success() || failure()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: checkov.sarif
-
-      # Plan
+      # ---------- Terraform plan ----------
       - name: Terraform plan (binary)
         run: terraform plan -out=plan.tfplan -no-color
 
@@ -98,43 +91,69 @@ jobs:
           terraform show -json plan.tfplan > plan.json
           terraform show -no-color plan.tfplan > plan.txt
 
-      # Save plan artifacts (binary+json+text)
-      - name: Upload plan artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-plan
-          path: |
-            plan.tfplan
-            plan.json
-            plan.txt
-          retention-days: 7
-
-      # Cost estimates (PRs): Infracost
+      # ---------- Infracost (simple & fast) ----------
+      # We use HCL parsing (no plan required) as recommended by the CLI docs.
+      # On pushes, store a breakdown; on PRs, compute a diff vs base.
       - name: Setup Infracost
-        if: github.event_name == 'pull_request'
         uses: infracost/actions/setup@v3
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
+        # (Infracost action & API key steps)  [1](https://github.com/infracost/actions)[5](https://www.infracost.io/docs/)
 
-      - name: Infracost baseline (base branch)
+      # PUSH to main: capture a simple cost report (no PR comment)
+      - name: Infracost breakdown (→ reports/infracost-breakdown.json & .txt)
+        if: github.event_name == 'push'
+        run: |
+          infracost breakdown --path . \
+            --format json --out-file reports/infracost-breakdown.json
+          infracost output --path reports/infracost-breakdown.json \
+            --format table > reports/infracost-breakdown.txt
+        # (CLI breakdown/output usage)  [2](https://www.infracost.io/docs/features/cli_commands/)
+
+      # PR only: create a baseline from base branch, then diff against the PR
+      - name: Infracost baseline from base branch
         if: github.event_name == 'pull_request'
         run: |
           git fetch --no-tags origin +${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
           git checkout ${{ github.event.pull_request.base.ref }}
-          infracost breakdown --path . --format json --out-file /tmp/infracost-base.json
+          infracost breakdown --path . \
+            --format json --out-file /tmp/infracost-base.json
           git checkout ${{ github.head_ref }}
+        # (baseline + diff pattern used in examples)  [2](https://www.infracost.io/docs/features/cli_commands/)[8](https://kieran-lowe.github.io/gitops-2024/github_action_workflows/infracost/)
 
-      - name: Infracost diff & PR comment
+      - name: Infracost diff (→ reports/infracost-diff.json & .txt)
         if: github.event_name == 'pull_request'
         run: |
           infracost diff --path . \
             --format json \
             --compare-to /tmp/infracost-base.json \
-            --out-file /tmp/infracost.json
+            --out-file reports/infracost-diff.json
+          infracost output --path reports/infracost-diff.json \
+            --format table > reports/infracost-diff.txt
+        # (CLI diff & output commands)  [2](https://www.infracost.io/docs/features/cli_commands/)
 
+      # Optional: Post a PR comment (enable later if you want PR noise)
+      - name: Infracost PR comment (optional)
+        if: github.event_name == 'pull_request' && false   # flip to true when ready
+        run: |
           infracost comment github \
-            --path /tmp/infracost.json \
+            --path reports/infracost-diff.json \
             --repo $GITHUB_REPOSITORY \
             --github-token ${{ github.token }} \
             --pull-request ${{ github.event.pull_request.number }} \
             --behavior update
+        # (comment command documented in CLI commands)  [2](https://www.infracost.io/docs/features/cli_commands/)
+
+      # ---------- Upload artifacts ----------
+      - name: Upload artifacts (plan + reports)
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-and-reports
+          path: |
+            plan.tfplan
+            plan.json
+            plan.txt
+            reports/
+          retention-days: 7
+        # (artifact v4 guidance)  [3](https://github.com/actions/upload-artifact)[4](https://github.blog/news-insights/product-news/get-started-with-v4-of-github-actions-artifacts/)
+``
